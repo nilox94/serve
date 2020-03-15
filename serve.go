@@ -42,6 +42,7 @@ const version = "v0.3.2"
 var (
 	auth         = flag.String("a", "", `Require basic authentication with the given credentials (e.g. -a "alice:secret")`)
 	bind         = flag.String("b", "0.0.0.0", `Bind to (listen on) a specific interface. "0.0.0.0" is for ALL interfaces. "localhost" disables access from other devices.`)
+	cors         = flag.Bool("c", false, "Enable CORS")
 	directory    = flag.String("d", ".", "The directory of static files to host")
 	help         = flag.Bool("h", false, "Print the usage")
 	port         = flag.String("p", "8080", "Port to serve on. 8080 by default for HTTP, 8443 for HTTPS (when using the -s flag)")
@@ -120,6 +121,11 @@ func main() {
 	// If the "-a" flag was used, use basic authentication middleware
 	if *auth != "" {
 		finalHandler = withBasicAuth(finalHandler)
+	}
+
+	// If the "-c" flag was used, use CORS middleware
+	if *cors {
+		finalHandler = withCORS(finalHandler)
 	}
 
 	// Register handler for "/" in Go's DefaultServeMux
